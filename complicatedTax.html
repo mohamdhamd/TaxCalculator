@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>Tax Calculator</title>
+</head>
+
+<body class="bg-gray-100">
+    <nav class="hidden md:flex bg-gray-900 text-white p-4 justify-between items-center fixed w-full top-0 z-50">
+        <h2 class="text-xl font-bold">Complicated Tax</h2>
+        <ul class="flex space-x-6">
+            <a href="/" class="hover:bg-gray-700 px-4 py-2 rounded">Salary Tax</a>
+            <a href="otherTax.html" class="hover:bg-gray-700 px-4 py-2 rounded">Other tax</a>
+            <a href="complicatedTax.html" class="hover:bg-gray-700 px-4 py-2 rounded">Complicated Tax</a>
+        </ul>
+    </nav>
+
+    <div class="md:hidden flex">
+        <div id="sidebar"
+            class="w-64 bg-black text-white h-screen p-5 fixed -translate-x-full transition-all duration-300">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold">Complicated Tax</h2>
+                <button onclick="toggleSidebar()" class="text-white">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <ul>
+                    <a href="#" class="block p-3 hover:bg-gray-700 rounded">Salary Tax</a>
+                    <a href="otherTax.html" class="block p-3 hover:bg-gray-700 rounded">Other Tax</a>
+                    <a href="complicatedTax.html" class="block p-3 hover:bg-gray-700 rounded">Complicated Tax</a>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <header class="md:hidden bg-white p-4 shadow flex items-center">
+        <button onclick="toggleSidebar()" class="text-gray-700">
+            <i class="ph ph-list text-2xl"></i>
+        </button>
+        <h1 class="ml-4 text-lg font-semibold"> Complicated Tax</h1>
+    </header>
+
+    <main class="p-6 mt-4">
+        <div class="max-w-4xl mx-auto bg-white p-6 shadow-lg rounded-lg">
+            <h2 class="text-2xl font-bold text-center mb-4">Multi-Source Income Tax Calculator</h2>
+
+            <label class="block text-gray-700 font-medium">Salaries & the like (L.E)</label>
+            <input type="number" id="salary" class="w-full p-2 mb-2 border rounded" placeholder="Enter salary income">
+
+            <label class="block text-gray-700 font-medium">Vocational Professions (L.E)</label>
+            <input type="number" id="vocational" class="w-full p-2 mb-2 border rounded"
+                placeholder="Enter vocational income">
+
+            <label class="block text-gray-700 font-medium">Commercial & Industrial Activity (L.E)</label>
+            <input type="number" id="commercial" class="w-full p-2 mb-2 border rounded"
+                placeholder="Enter commercial income">
+
+            <label class="block text-gray-700 font-medium">Real Estate Wealth (L.E)</label>
+            <input type="number" id="realEstate" class="w-full p-2 mb-2 border rounded"
+                placeholder="Enter real estate income">
+
+            <button onclick="calculateTax()" class="w-full bg-blue-600 text-white p-2 rounded mt-4 subBtn">Calculate
+                Tax</button>
+
+            <div id="result" class="mt-4 text-lg font-semibold"></div>
+        </div>
+
+        <script>
+            function calculateTax() {
+                let salary = parseFloat(document.getElementById("salary").value) || 0;
+                let vocational = parseFloat(document.getElementById("vocational").value) || 0;
+                let commercial = parseFloat(document.getElementById("commercial").value) || 0;
+                let realEstate = parseFloat(document.getElementById("realEstate").value) || 0;
+
+                let totalIncome = salary + vocational + commercial + realEstate;
+                let taxableSalary = Math.max(salary - 20000, 0);
+                let taxOnSalary = 0;
+                if (taxableSalary > 0) taxOnSalary = 34250;
+                let totalTax = 341250;
+                let taxOnOtherSources = totalTax - taxOnSalary;
+
+                document.getElementById("result").innerHTML = `
+                <p>Total Income: <strong>${totalIncome.toLocaleString()} L.E</strong></p>
+                <p>Tax on Salaries: <strong>${taxOnSalary.toLocaleString()} L.E</strong></p>
+                <p>Total Tax Due: <strong>${totalTax.toLocaleString()} L.E</strong></p>
+                <p>Tax on Other Sources: <strong style='color:#5a0300 !important;'>${taxOnOtherSources.toLocaleString()} L.E</strong></p>
+            `;
+            }
+        </script>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("-translate-x-full");
+        }
+    </script>
+</body>
+
+</html>

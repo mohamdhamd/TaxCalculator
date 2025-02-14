@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>Tax Calculator</title>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Navbar for Large Screens -->
+    <nav class="hidden md:flex bg-gray-900 text-white p-4 justify-between items-center fixed w-full top-0 z-50" >
+        <h2 class="text-xl font-bold">Dashboard</h2>
+        <ul class="flex space-x-6">
+            <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Home</a>
+            <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Profile</a>
+            <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Settings</a>
+            <a href="#" class="hover:bg-gray-700 px-4 py-2 rounded">Logout</a>
+        </ul>
+    </nav>
+
+    <!-- Sidebar for Medium & Small Screens -->
+    <div class="md:hidden flex">
+        <div id="sidebar"
+            class="w-64 bg-black text-white h-screen p-5 fixed -translate-x-full transition-all duration-300">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold">Dashboard</h2>
+                <button onclick="toggleSidebar()" class="text-white">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <ul>
+                    <a href="/" class="block p-3 hover:bg-gray-700 rounded">Salary Tax</a>
+                    <a href="otherTax.html" class="block p-3 hover:bg-gray-700 rounded">Other Tax</a>
+                    <a href="complicatedTax.html" class="block p-3 hover:bg-gray-700 rounded">Complicated Tax</a>
+                    <!-- <a href="#" class="block p-3 hover:bg-gray-700 rounded">Settings</a>
+                    <a href="#" class="block p-3 hover:bg-gray-700 rounded">Logout</a> -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Header for Small Screens -->
+    <header class="md:hidden bg-white p-4 shadow flex items-center">
+        <button onclick="toggleSidebar()" class="text-gray-700">
+            <i class="ph ph-list text-2xl"></i>
+        </button>
+        <h1 class="ml-4 text-lg font-semibold">Salary Tax</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-6 mt-4">
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-6 shadow-lg rounded-lg w-full max-w-3xl">
+        <h2 class="text-2xl font-bold text-center mb-4">Salary Tax Calculator</h2>
+
+        <!-- Form Input -->
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium">Enter Your Monthly Salary</label>
+            <input type="number" id="monthlyIncome"
+                class="w-full p-3 mt-1 rounded bg-gray-200 text-black outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your salary" required>
+        </div>
+
+        <button onclick="calculateTax()"
+            class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition-all subBtn">
+            Calculate Tax
+        </button>
+
+        <!-- Output -->
+        <div id="result" class="mt-6 text-lg font-semibold text-center text-gray-800"></div>
+
+        <!-- Tax Breakdown Table -->
+        <div id="taxTable" class="mt-6 hidden">
+            <h3 class="text-xl font-bold mb-2 text-center">Tax Breakdown</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border border-gray-300 text-left">
+                    <thead class="bg-gray-800 text-white">
+                        <tr>
+                            <th class="p-3 border">Bracket</th>
+                            <th class="p-3 border">Amount (L.E)</th>
+                            <th class="p-3 border">Rate</th>
+                            <th class="p-3 border">Tax Amount (L.E)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taxBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateTax() {
+        const monthlyIncome = parseFloat(document.getElementById("monthlyIncome").value);
+        if (isNaN(monthlyIncome) || monthlyIncome <= 0) {
+            document.getElementById("result").innerHTML = "<p class='text-red-600'>Please enter a valid salary.</p>";
+            document.getElementById("taxTable").classList.add("hidden");
+            return;
+        }
+
+        // Annual taxable income
+        let annualIncome = monthlyIncome * 12;
+        let taxBase = annualIncome - 20000; // Deduct personal exemption
+        let taxDue = 0;
+
+        // Tax brackets
+        const taxBrackets = [
+            { min: 1, max: 40000, rate: 0 },
+            { min: 40001, max: 55000, rate: 0.10 },
+            { min: 55001, max: 70000, rate: 0.15 },
+            { min: 70001, max: 200000, rate: 0.20 },
+            { min: 200001, max: 400000, rate: 0.225 },
+            { min: 400001, max: 1200000, rate: 0.25 },
+            { min: 1200001, max: Infinity, rate: 0.275 }
+        ];
+
+        // Tax Calculation
+        let remainingIncome = taxBase;
+        let taxSteps = "";
+        for (let bracket of taxBrackets) {
+            if (remainingIncome <= 0) break;
+            if (taxBase > bracket.min) {
+                let taxableAmount = Math.min(remainingIncome, bracket.max - bracket.min);
+                let taxAmount = taxableAmount * bracket.rate;
+                taxDue += taxAmount;
+                remainingIncome -= taxableAmount;
+
+                // Add row to tax breakdown table
+                taxSteps += `
+                    <tr class="border">
+                        <td class="p-3">${bracket.min} - ${bracket.max === Infinity ? "Above" : bracket.max}</td>
+                        <td class="p-3">${taxableAmount.toLocaleString()}</td>
+                        <td class="p-3">${(bracket.rate * 100).toFixed(1)}%</td>
+                        <td class="p-3">${taxAmount.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        let monthlyTax = taxDue / 12;
+
+        document.getElementById("result").innerHTML = `
+            <p>Annual Taxable Income: <strong>${taxBase.toLocaleString()} L.E</strong></p>
+            <p>Annual Tax Due: <strong>${taxDue.toLocaleString()} L.E</strong></p>
+            <p>Monthly Tax Due: <strong style='color:#5a0300 !important;'>${monthlyTax.toFixed(2)} L.E</strong></p>
+        `;
+
+        // Display tax breakdown table
+        document.getElementById("taxBody").innerHTML = taxSteps;
+        document.getElementById("taxTable").classList.remove("hidden");
+    }
+</script>
+
+    </main>
+
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("-translate-x-full");
+        }
+    </script>
+</body>
+
+</html>
